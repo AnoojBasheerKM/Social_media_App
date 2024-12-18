@@ -27,6 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
             return serializers.ValidationError("password Missmatch")
 
         return User.objects.create_user(**validated_data,password=password1)
+    
+        
 
 
 
