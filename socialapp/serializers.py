@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from socialapp.models import User
+from socialapp.models import User,Post
 
 class UserSerializer(serializers.ModelSerializer):
     
@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         
         model = User
 
-        fields = ["id","username","email","phone","password"]
+        fields = ["id","username","email","phone","password1","password2"]
 
         read_only_fields=["id","password"]
         
@@ -27,6 +27,20 @@ class UserSerializer(serializers.ModelSerializer):
             return serializers.ValidationError("password Missmatch")
 
         return User.objects.create_user(**validated_data,password=password1)
+    
+class PostSerializer(serializers.ModelSerializer):
+    
+    owner = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        
+        model = Post
+        
+        fields = "__all__"
+
+        read_only_fields = ["id","owner","created_at","updated_at","liked_by"]
+
+        
     
         
 
