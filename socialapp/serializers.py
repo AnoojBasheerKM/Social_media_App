@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from socialapp.models import User,Post
+from socialapp.models import User,Post,Comment
 
 class UserSerializer(serializers.ModelSerializer):
     
@@ -31,6 +31,16 @@ class UserSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     
     owner = serializers.StringRelatedField(read_only=True)
+    
+    liked_by = serializers.StringRelatedField(read_only = True,many=True)
+    
+    like_count = serializers.SerializerMethodField()
+    
+    comment = serializers.SerializerMethodField()
+    
+    comment_count = serializers.SerializerMethodField()
+    
+    
 
     class Meta:
         
@@ -40,8 +50,45 @@ class PostSerializer(serializers.ModelSerializer):
 
         read_only_fields = ["id","owner","created_at","updated_at","liked_by"]
 
+    def get_like_count(self,obj):
         
+        return obj.liked_by.all().count()
     
+    def get_comment_count(self,obj):
+        
+        return Comment.objects.filter(Post=obj).count()
+    
+    def get_comment(self,obj):
+        
+        qs = Comment.objects.filter(Post=obj)
+        
+        serializer_instance = CommentSerializer(qs)
+
+        return serializer_instance.data
+    
+class CommentSerializer(serializers.ModelSerializer):
+    
+    owner = serializers.StringRelatedField(read_only=True)
+    
+    class Meta:
+        
+        model = Comment
+
+        fields = "__all__"
+
+        read_only_fields = ["id","post","owner","created_at"]
+        
+class ProfileSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        
+        model = User
+
+        fields = "__all__"
+
+        read_only_fields = ["id","owner"]
+
+        
         
 
 
